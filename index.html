@@ -40,11 +40,11 @@
 
 <script>
     let queue = [];
-    let lastNumber = 0;
+    let currentNumber = 0;
 
     function takeQueue() {
-        lastNumber++;
-        queue.push(lastNumber);
+        currentNumber++;
+        queue.push(currentNumber);
         updateDisplay();
     }
 
@@ -54,23 +54,19 @@
             document.getElementById('current-queue').innerText = serving;
             updateDisplay();
             
-            // --- ระบบเสียงเรียกภาษาไทย ---
-            let msg = new SpeechSynthesisUtterance();
-            msg.text = "ขอเชิญหมายเลข " + serving + " ค่ะ";
-            msg.lang = 'th-TH';
-            msg.rate = 0.9; // ความเร็วพอดีๆ
-            window.speechSynthesis.speak(msg);
-        } else {
-            alert("ขณะนี้ไม่มีคิวรอในระบบครับ");
-        }
-    }
+            // สั่งให้หยุดเสียงเก่าที่อาจจะค้างอยู่ก่อน
+            window.speechSynthesis.cancel(); 
 
-    function resetQueue() {
-        if(confirm("คุณต้องการล้างคิวทั้งหมดเพื่อเริ่มนับหนึ่งใหม่ใช่หรือไม่?")) {
-            queue = [];
-            lastNumber = 0;
-            document.getElementById('current-queue').innerText = "0";
-            updateDisplay();
+            // สร้างคำสั่งเสียงใหม่
+            let msg = new SpeechSynthesisUtterance("ขอเชิญหมายเลข " + serving + " ค่ะ");
+            msg.lang = 'th-TH';
+            msg.rate = 0.9; // ปรับความเร็วให้ช้าลงนิดนึงเพื่อให้ฟังชัด
+            
+            // สั่งให้พูด
+            window.speechSynthesis.speak(msg);
+            
+        } else {
+            alert("ขณะนี้ไม่มีคิวรออยู่ครับ");
         }
     }
 
