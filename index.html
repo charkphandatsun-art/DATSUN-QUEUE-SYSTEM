@@ -58,7 +58,7 @@
             window.speechSynthesis.cancel(); 
 
             // สร้างคำสั่งเสียงใหม่
-            let msg = new SpeechSynthesisUtterance("ขอเชิญหมายเลข " + serving + " ค่ะ");
+            let msg = new speechSynthesisUtterance("ขอเชิญหมายเลข " + serving + " ค่ะ");
             msg.lang = 'th-TH';
             msg.rate = 0.9; // ปรับความเร็วให้ช้าลงนิดนึงเพื่อให้ฟังชัด
             
