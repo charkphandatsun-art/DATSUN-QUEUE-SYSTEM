@@ -2,40 +2,25 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DATSUN Queue System</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; background-color: #eef2f7; padding-top: 50px; color: #333; }
-        .container { background: white; padding: 40px; border-radius: 20px; display: inline-block; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-top: 8px solid #007bff; }
-        h1 { margin-bottom: 10px; color: #007bff; }
-        .label { font-size: 1.2rem; color: #666; }
-        .number { font-size: 100px; font-weight: bold; color: #333; margin: 10px 0; }
-        .queue-waiting { background: #f8f9fa; padding: 15px; border-radius: 10px; margin: 20px 0; min-width: 300px; }
-        button { font-size: 18px; padding: 12px 25px; cursor: pointer; border: none; border-radius: 8px; margin: 5px; transition: 0.3s; font-weight: bold; }
+        body { font-family: sans-serif; text-align: center; background-color: #f4f4f9; padding-top: 50px; }
+        .container { background: white; padding: 30px; border-radius: 15px; display: inline-block; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        h1 { color: #333; }
+        .number { font-size: 80px; font-weight: bold; color: #007bff; margin: 20px 0; }
+        button { font-size: 18px; padding: 10px 20px; cursor: pointer; border: none; border-radius: 5px; margin: 5px; }
         .btn-get { background-color: #28a745; color: white; }
-        .btn-get:hover { background-color: #218838; }
         .btn-call { background-color: #007bff; color: white; }
-        .btn-call:hover { background-color: #0069d9; }
-        .btn-reset { background-color: #dc3545; color: white; margin-top: 20px; font-size: 14px; opacity: 0.7; }
-        .btn-reset:hover { opacity: 1; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h1>ระบบจัดการคิว</h1>
-    <p class="label">หมายเลขที่กำลังเรียก</p>
     <div class="number" id="current-queue">0</div>
-    
-    <div class="queue-waiting">
-        <strong>คิวที่รออยู่ในระบบ:</strong><br>
-        <span id="queue-list">ไม่มี</span>
-    </div>
-
-    <button class="btn-get" onclick="takeQueue()">กดรับคิวใหม่</button>
+    <p>คิวที่กำลังรอ: <span id="queue-list">ไม่มี</span></p>
+    <button class="btn-get" onclick="takeQueue()">กดรับคิว</button>
     <button class="btn-call" onclick="callNext()">เรียกคิวถัดไป</button>
-    <br>
-    <button class="btn-reset" onclick="resetQueue()">เริ่มนับหนึ่งใหม่ (Reset)</button>
 </div>
 
 <script>
@@ -54,16 +39,13 @@
             document.getElementById('current-queue').innerText = serving;
             updateDisplay();
             
-            // สั่งให้หยุดเสียงเก่าที่อาจจะค้างอยู่ก่อน
-            window.speechSynthesis.cancel(); 
-
-            // สร้างคำสั่งเสียงใหม่
-            let msg = new speechSynthesisUtterance("ขอเชิญหมายเลข " + serving + " ค่ะ");
-            msg.lang = 'th-TH';
-            msg.rate = 0.9; // ปรับความเร็วให้ช้าลงนิดนึงเพื่อให้ฟังชัด
-            
-            // สั่งให้พูด
+            // --- ส่วนที่เพิ่มใหม่: ระบบเสียงเรียก ---
+            let msg = new SpeechSynthesisUtterance();
+            msg.text = "ขอเชิญหมายเลข " + serving + " ค่ะ";
+            msg.lang = 'th-TH'; // ตั้งค่าเป็นภาษาไทย
+            msg.rate = 1.0;     // ความเร็วของเสียง
             window.speechSynthesis.speak(msg);
+            // -----------------------------------
             
         } else {
             alert("ขณะนี้ไม่มีคิวรออยู่ครับ");
