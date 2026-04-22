@@ -39,6 +39,37 @@
             document.getElementById('current-queue').innerText = serving;
             updateDisplay();
             
+            // --- โค้ดเสียงเวอร์ชันแก้ปัญหา ---
+            window.speechSynthesis.cancel(); // ล้างคิวเสียงที่ค้างอยู่เก่าๆ ออกก่อน
+            
+            let msg = new SpeechSynthesisUtterance();
+            msg.text = "ขอเชิญหมายเลข " + serving + " ค่ะ";
+            msg.lang = 'th-TH';
+            msg.volume = 1; // ความดัง 0 ถึง 1
+            msg.rate = 0.9;  // ปรับให้ช้าลงนิดนึงเพื่อให้ฟังชัด
+            msg.pitch = 1;  // ระดับเสียงสูงต่ำ
+            
+            // ตรวจสอบว่ามีเสียงในเครื่องไหม
+            let voices = window.speechSynthesis.getVoices();
+            if (voices.length === 0) {
+                // ถ้ายังโหลดเสียงไม่เสร็จ ให้รอแป๊บเดียวแล้วลองใหม่
+                window.speechSynthesis.onvoiceschanged = () => {
+                    window.speechSynthesis.speak(msg);
+                };
+            } else {
+                window.speechSynthesis.speak(msg);
+            }
+            // -----------------------------------
+            
+        } else {
+            alert("ขณะนี้ไม่มีคิวรออยู่ครับ");
+        }
+    }function callNext() {
+        if (queue.length > 0) {
+            let serving = queue.shift();
+            document.getElementById('current-queue').innerText = serving;
+            updateDisplay();
+            
             // --- ส่วนที่เพิ่มใหม่: ระบบเสียงเรียก ---
             let msg = new SpeechSynthesisUtterance();
             msg.text = "ขอเชิญหมายเลข " + serving + " ค่ะ";
