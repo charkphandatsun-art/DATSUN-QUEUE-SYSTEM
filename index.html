@@ -38,6 +38,23 @@
             let serving = queue.shift();
             document.getElementById('current-queue').innerText = serving;
             updateDisplay();
+            
+            // --- ส่วนที่เพิ่มใหม่: ระบบเสียงเรียก ---
+            let msg = new SpeechSynthesisUtterance();
+            msg.text = "ขอเชิญหมายเลข " + serving + " ค่ะ";
+            msg.lang = 'th-TH'; // ตั้งค่าเป็นภาษาไทย
+            msg.rate = 1.0;     // ความเร็วของเสียง
+            window.speechSynthesis.speak(msg);
+            // -----------------------------------
+            
+        } else {
+            alert("ขณะนี้ไม่มีคิวรออยู่ครับ");
+        }
+    }function callNext() {
+        if (queue.length > 0) {
+            let serving = queue.shift();
+            document.getElementById('current-queue').innerText = serving;
+            updateDisplay();
         } else {
             alert("ขณะนี้ไม่มีคิวรออยู่ครับ");
         }
