@@ -2,71 +2,83 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DATSUN Queue System</title>
     <style>
-        body { font-family: sans-serif; text-align: center; background-color: #f4f4f9; padding-top: 50px; }
-        .container { background: white; padding: 30px; border-radius: 15px; display: inline-block; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        h1 { color: #333; }
-        .number { font-size: 80px; font-weight: bold; color: #007bff; margin: 20px 0; }
-        button { font-size: 18px; padding: 10px 20px; cursor: pointer; border: none; border-radius: 5px; margin: 5px; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; background-color: #eef2f7; padding-top: 50px; }
+        .container { background: white; padding: 40px; border-radius: 20px; display: inline-block; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: 2px solid #007bff; }
+        h1 { color: #007bff; margin-bottom: 10px; }
+        .status-label { font-size: 18px; color: #666; }
+        .number { font-size: 100px; font-weight: bold; color: #28a745; margin: 20px 0; line-height: 1; }
+        .controls { margin-top: 30px; }
+        button { font-size: 20px; padding: 15px 30px; cursor: pointer; border: none; border-radius: 10px; margin: 10px; transition: 0.3s; font-weight: bold; }
         .btn-get { background-color: #28a745; color: white; }
+        .btn-get:hover { background-color: #218838; }
         .btn-call { background-color: #007bff; color: white; }
+        .btn-call:hover { background-color: #0069d9; }
+        .queue-info { margin-top: 20px; padding: 10px; background: #f8f9fa; border-radius: 10px; color: #555; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>ระบบจัดการคิว</h1>
+    <h1>DATSUN Queue System</h1>
+    <div class="status-label">หมายเลขที่กำลังเรียก</div>
     <div class="number" id="current-queue">0</div>
-    <p>คิวที่กำลังรอ: <span id="queue-list">ไม่มี</span></p>
-    <button class="btn-get" onclick="takeQueue()">กดรับคิว</button>
-    <button class="btn-call" onclick="callNext()">เรียกคิวถัดไป</button>
+    
+    <div class="queue-info">
+        คิวที่รออยู่ในระบบ: <span id="queue-list" style="font-weight:bold;">ไม่มี</span>
+    </div>
+
+    <div class="controls">
+        <button class="btn-get" onclick="takeQueue()">➕ รับคิวใหม่</button>
+        <button class="btn-call" onclick="callNext()">📢 เรียกคิวถัดไป</button>
+    </div>
 </div>
 
 <script>
     let queue = [];
-    let currentNumber = 0;
+    let lastNumber = 0;
 
     function takeQueue() {
-        currentNumber++;
-        queue.push(currentNumber);
+        lastNumber++;
+        queue.push(lastNumber);
         updateDisplay();
+        // แจ้งเตือนสั้นๆ ว่ารับคิวแล้ว
+        console.log("รับคิวใหม่: " + lastNumber);
     }
 
     function callNext() {
         if (queue.length > 0) {
-            let serving = queue.shift();
+            let serving = queue.shift(); // ดึงคิวแรกออกมา
             document.getElementById('current-queue').innerText = serving;
             updateDisplay();
             
-            // --- โค้ดเสียงเวอร์ชันแก้ปัญหา ---
-            window.speechSynthesis.cancel(); // ล้างคิวเสียงที่ค้างอยู่เก่าๆ ออกก่อน
-            
-            let msg = new SpeechSynthesisUtterance();
-            msg.text = "ขอเชิญหมายเลข " + serving + " ค่ะ";
-            msg.lang = 'th-TH';
-            msg.volume = 1; // ความดัง 0 ถึง 1
-            msg.rate = 0.9;  // ปรับให้ช้าลงนิดนึงเพื่อให้ฟังชัด
-            msg.pitch = 1;  // ระดับเสียงสูงต่ำ
-            
-            // ตรวจสอบว่ามีเสียงในเครื่องไหม
-            let voices = window.speechSynthesis.getVoices();
-            if (voices.length === 0) {
-                // ถ้ายังโหลดเสียงไม่เสร็จ ให้รอแป๊บเดียวแล้วลองใหม่
-                window.speechSynthesis.onvoiceschanged = () => {
-                    window.speechSynthesis.speak(msg);
-                };
-            } else {
-                window.speechSynthesis.speak(msg);
-            }
-            // -----------------------------------
-            
+            // ระบบเสียงเรียกภาษาไทย
+            playVoice(serving);
         } else {
-            alert("ขณะนี้ไม่มีคิวรออยู่ครับ");
+            alert("ขณะนี้ไม่มีคิวรอในระบบครับ");
         }
-    
-        function updateDisplay() {
-        document.getElementById('queue-list').innerText = queue.length > 0 ? queue.join(", ") : "ไม่มี";
+    }
+
+    function playVoice(num) {
+        // ยกเลิกเสียงที่กำลังพูดอยู่ก่อนหน้า (ถ้ามี)
+        window.speechSynthesis.cancel();
+        
+        let msg = new SpeechSynthesisUtterance();
+        msg.text = "ขอเชิญหมายเลข " + num + " ค่ะ";
+        msg.lang = 'th-TH';
+        msg.rate = 0.9; // ปรับให้พูดช้าลงนิดนึงเพื่อให้ฟังชัด
+        window.speechSynthesis.speak(msg);
+    }
+
+    function updateDisplay() {
+        let listElement = document.getElementById('queue-list');
+        if (queue.length > 0) {
+            listElement.innerText = queue.join(", ");
+        } else {
+            listElement.innerText = "ไม่มี";
+        }
     }
 </script>
 
